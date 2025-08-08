@@ -188,9 +188,46 @@ class PolicyIterationAgent(DynamicProgrammingAgent):
         super().__init__(gamma)
 
     def policyIterate(self):
-        ## LABORATORIO 3
-        pass 
-    
+        """
+        This method implements the policy iteration algorithm, using
+        the policy evaluation steps.
+        """
+        V, pi = self.initSVAndPi()# Initialize policy and value function
+
+        is_policy_stable = False # Flag to check if policy is stable
+        theta = 1e-4    # Small threshold for determining convergence
+
+        # Iterate until policy is stable
+        while not is_policy_stable:
+            # Policy Evaluation
+            while True:
+                delta = 0 # Initialize the maximum change in value
+                # Iterate over all states
+                for s in self.S:
+                    # Check if state is terminal
+                    if s.isTerminal():
+                        continue # If it is continue
+
+                    v = V[s] # Store the current value
+                    new_v = 0 # Initialize the new value
+
+                    # Iterate over each action, probability tuple
+                    for a, action_prob in enumerate(pi[s]):
+                        for s_prime in self.S:
+                            p = s.getNextStateLikelihood(a, s_prime) # Get the transition probability
+                            new_v += action_prob * p * (s_prime.getReward() + self.gamma * V[s_prime]) # Update the new value using the Bellman equation
+
+                    V[s] = new_v # Store the new value in the value function
+                    delta = max(delta, abs(v - V[s])) # Update the maximum change in value
+
+                # Check if the value function has converged
+                if delta < theta:
+                    break # If it has, then stop the evaluation
+
+        # Policy Improvement
+        
+
+
     def policyImprove(self, pi, V):
         ## LABORATORIO 3 
         pass 
