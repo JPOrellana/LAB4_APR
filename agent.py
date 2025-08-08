@@ -224,10 +224,34 @@ class PolicyIterationAgent(DynamicProgrammingAgent):
                 if delta < theta:
                     break # If it has, then stop the evaluation
 
-        # Policy Improvement
-        
+            # Policy Improvement
+            pi, is_policy_stable = self.policyImprove(pi, V) # Improve the policy using the value function
 
+            # Print the policy and value function
+            self._printPolicy(pi)
+            self._printStateValues(V)
 
     def policyImprove(self, pi, V):
-        ## LABORATORIO 3 
-        pass 
+        new_pi = {} # Initialize the new policy
+        is_policy_stable = True # Flag to check if the policy is stable
+
+        # Iterate over all states
+        for s in self.S:
+            # Check if the state is terminal
+            if s.isTerminal():
+                continue # If it is, continue
+            
+            old_action = np.argmax(pi[s]) # Get the old action from the policy
+            action_values = self.getActionValuesForState(s, V) # Get the action values for the state
+            best_action = np.argmax(action_values) # Get the best action from the action values
+
+            # Update the policy
+            new_policy = np.zeros(self.num_actions) # Initialize the new policy
+            new_policy[best_action] = 1.0 # Set the best action to 1
+            new_pi[s] = new_policy # Update the policy in the state
+
+            # Check if the old action is different from the best action
+            if old_action != best_action:
+                is_policy_stable = False # If it is, then the policy is not stable
+
+        return new_pi, is_policy_stable # Return the new policy and the stability flag
