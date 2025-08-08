@@ -196,9 +196,11 @@ class PolicyIterationAgent(DynamicProgrammingAgent):
 
         is_policy_stable = False # Flag to check if policy is stable
         theta = 1e-4    # Small threshold for determining convergence
+        iteration = 1 # Initial iteration counter
 
         # Iterate until policy is stable
         while not is_policy_stable:
+            print(f"\n----- POLICY ITERATION: {iteration} -----")
             # Policy Evaluation
             while True:
                 delta = 0 # Initialize the maximum change in value
@@ -223,15 +225,37 @@ class PolicyIterationAgent(DynamicProgrammingAgent):
                 # Check if the value function has converged
                 if delta < theta:
                     break # If it has, then stop the evaluation
+            
+                # Show the updated values
+                self._printStateValues(V) # Print the state values
 
             # Policy Improvement
             pi, is_policy_stable = self.policyImprove(pi, V) # Improve the policy using the value function
 
-            # Print the policy and value function
-            self._printPolicy(pi)
-            self._printStateValues(V)
+            # Check if policy is stable
+            if is_policy_stable:
+                print("SUCCESS: Policy is stable.")
+                self._printStateValues(V)
+
+            # Increase the policy iteration counter
+            iteration += 1
+
+            # Show the new policy
+            self._printPolicy(pi) # Print the policy
+
 
     def policyImprove(self, pi, V):
+        """
+        This method implements the policy improvement step.
+
+        Args:
+            pi: The current policy.
+            V: The current state value function.
+
+        Returns:
+            new_pi: The improved policy.
+            is_policy_stable: A boolean indicating if the policy is stable.
+        """
         new_pi = {} # Initialize the new policy
         is_policy_stable = True # Flag to check if the policy is stable
 
